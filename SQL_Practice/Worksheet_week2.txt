@@ -1,0 +1,44 @@
+-- 1. Show details of rentals with completed payments
+SELECT * 
+FROM rental INNER JOIN payment
+ON rental.rental_id = payment.rental_id
+
+-- 2. For each rental, show the name of the customer and the name of the staff member who processed the rental.
+SELECT rental.rental_id, staff.first_name AS staff_name, customer.first_name AS customer_name
+FROM rental INNER JOIN customer
+ON rental.customer_id = customer.customer_id
+INNER JOIN staff
+ON staff.staff_id = rental.staff_id
+
+-- 3. For each rental, show the name of the customer and the name of the staff members who processed the payments for that rental.
+SELECT rental.rental_id,customer.first_name AS customer_name, payment.staff_id AS payment_staff_id,staff.staff_id, staff.first_name
+FROM rental INNER JOIN customer
+ON rental.customer_id = customer.customer_id
+INNER JOIN payment
+ON payment.rental_id = rental.rental_id
+INNER JOIN staff
+ON payment.staff_id = staff.staff_id
+
+-- 4. Show details of all rentals, even if they have not been paid for, with payment information where it exists
+SELECT * 
+FROM rental LEFT JOIN payment
+ON rental.rental_id = payment.rental_id
+
+-- 5. Show details of rentals which have not been paid for
+SELECT * 
+FROM rental LEFT JOIN payment
+ON rental.rental_id = payment.rental_id
+WHERE payment_id IS NULL
+
+-- 6. Find all the films which are not in the inventory for any store.
+SELECT * 
+FROM film LEFT JOIN inventory
+ON film.film_id = inventory.film_id
+WHERE inventory_id IS NULL
+
+-- 7. Find all the rentals rented by Barbara Jones.
+SELECT * 
+FROM rental INNER JOIN customer
+ON rental.customer_id = customer.customer_id
+WHERE customer.first_name ILIKE 'Barbara'
+AND customer.last_name ILIKE 'Jones'

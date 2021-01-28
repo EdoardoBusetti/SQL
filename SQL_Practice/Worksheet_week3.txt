@@ -1,0 +1,116 @@
+-- 1. Northwind: Show how many employees live in each city
+SELECT count(*),City
+FROM Employees
+GROUP BY City
+
+-- 2. Northwind: Show how many products are contained in each order
+SELECT OrderID, COUNT(*)
+FROM Order_details
+GROUP BY OrderID
+
+-- 3. Northwind: Show how many products are contained in each order (largest orders first)
+SELECT OrderID, COUNT(*) AS n
+FROM Order_details
+GROUP BY OrderID
+ORDER BY n DESC
+
+-- 4. Dvdrental: Show customers, sorted according to their rental counts.
+SELECT customer.first_name ||' '|| customer.last_name AS customer_name, COUNT(*) AS rental_count
+FROM customer INNER JOIN rental
+ON customer.customer_id = rental.customer_id
+GROUP BY  customer.customer_id
+
+-- 5. Dvdrental: Find the number of rentals performed by each member of staff.
+SELECT staff.first_name ||' '|| staff.last_name AS staff_name, COUNT(*) AS rentals_performed
+FROM staff INNER JOIN rental
+ON staff.staff_id = rental.staff_id
+GROUP BY staff.staff_id
+
+-- 6. Dvdrental: Which films were rented most?
+SELECT film.title, COUNT(*) AS times_rented
+FROM rental INNER JOIN inventory
+ON rental.inventory_id = inventory.inventory_id
+INNER JOIN film
+ON inventory.film_id = film.film_id
+GROUP BY film.film_id
+ORDER BY times_rented DESC
+
+-- 7. Northwind: Which employees processed the most orders?
+SELECT Employees.FirstName AS Employee_name, COUNT(*) AS order_count
+FROM Employees INNER JOIN Orders
+ON Employees.EmployeeID = Orders.EmployeeID
+GROUP BY Employees.EmployeeID
+ORDER BY order_count DESC
+
+-- 8. Northwind: Which customers ordered from the largest range of suppliers? Show the number of orders each customer made, and the number of different suppliers they ordered from.
+SELECT Customers.CustomerID,COUNT(Products.ProductID) AS Total_prods,COUNT(DISTINCT Suppliers.SupplierID) AS Distinct_suppliers
+FROM Customers INNER JOIN Orders
+ON Customers.CustomerID = Orders.CustomerID
+INNER JOIN Order_details
+ON Order_details.OrderID = Orders.OrderID
+INNER JOIN Products
+ON Products.ProductID = Order_details.ProductID
+INNER JOIN Suppliers
+On Products.SupplierID = Suppliers.SupplierID
+GROUP BY Customers.CustomerID
+ORDER BY Distinct_suppliers DESC
+
+-- 9. Dvdrental: Find the number of films each actor has played a role in.
+SELECT actor.first_name ||' '|| actor.last_name AS actor_name, COUNT(*) AS num_films
+FROM film_actor INNER JOIN actor
+ON film_actor.actor_id = actor.actor_id
+GROUP BY actor.actor_id
+ORDER BY num_films DESC
+
+-- 10. Dvdrental: Find the number of films each actor has played a role in. | Return the full name in one column, sorted alphabetically by last name.
+SELECT actor.first_name ||' '|| actor.last_name AS actor_name, COUNT(*) AS num_films
+FROM film_actor INNER JOIN actor
+ON film_actor.actor_id = actor.actor_id
+GROUP BY actor.actor_id
+ORDER BY actor.last_name ASC
+
+-- 11. Dvdrental: Find the number of customers in each country.
+SELECT country.country AS country_name, COUNT(*) AS num_customers
+FROM customer INNER JOIN address
+ON customer.address_id = address.address_id
+INNER JOIN city 
+ON address.city_id = city.city_id
+INNER JOIN country
+ON country.country_id = city.country_id
+GROUP BY country.country_id
+ORDER BY num_customers DESC
+
+-- 12. Northwind: Which employees processed the most orders? Show only employees who processed more than 100 orders.
+SELECT Employees.FirstName ||' '|| Employees.LastName AS Employee_name,COUNT(*) AS num_orders
+FROM Orders INNER JOIN Employees
+ON Orders.EmployeeID = Employees.EmployeeID
+GROUP BY Employees.EmployeeID
+HAVING COUNT(*) > 100
+
+-- 13. Dvdrental: Which films were rented most? Show only films with less than 10 rentals
+SELECT film.title AS movie_title, COUNT(*) AS num_rent
+FROM rental INNER JOIN inventory
+ON rental.inventory_id = inventory.inventory_id
+INNER JOIN film
+ON film.film_id = inventory.film_id
+GROUP BY film.title
+HAVING COUNT(*) <10
+ORDER BY num_rent DESC
+
+-- 14. Northwind: Show orders and shipping methods, along with the average freight weight for that shipping method. |shipvia: shipping method code | freight: freight weight
+SELECT OrderID, shipvia, AVG(freight) OVER (PARTITION BY shipvia) AS average_freight_weight
+FROM Orders
+
+-- 15. Northwind: Show product names. Each row should show the product name, its category name, and the total number of products in that category.
+SELECT ProductName, CategoryName, COUNT(*) OVER (PARTITION BY Categories.CategoryID) AS prod_in_cat
+FROM Products INNER JOIN Categories
+ON Products.CategoryID = Categories.CategoryID
+
+-- 16. Dvdrental: Show Eleanor Hunt’s rental history, with cumulative total of how much she has paid.
+SELECT customer.first_name ||' '|| customer.last_name, rental.rental_id, SUM(amount) OVER (ORDER BY rental_date)
+FROM customer INNER JOIN rental
+ON Customer.customer_id = rental.customer_id
+INNER JOIN payment 
+ON payment.rental_id = rental.rental_id
+WHERE customer.first_name ILIKE 'Eleanor' 
+AND customer.last_name ILIKE 'Hunt'

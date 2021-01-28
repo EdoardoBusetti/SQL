@@ -1,0 +1,47 @@
+-- 1. Movies: Show all movies.
+SELECT * FROM movies
+
+-- 2. Movies: Show 50 movies.
+SELECT * FROM movies
+LIMIT 50
+
+-- 3. Northwind: display all employees.
+SELECT * FROM Employees
+
+-- 4. Movies: Show top 50 movies, ordered by duration.
+SELECT * FROM movies
+WHERE duration IS NOT NULL
+ORDER BY duration DESC
+LIMIT 50
+
+-- 5. Dvdrental: show all active staff
+SELECT * FROM staff
+WHERE active = TRUE
+
+-- 6. Dvdrental: show all films released after 2000 which are longer than 120 mins
+SELECT * FROM film
+WHERE release_year > 2000
+AND length >120
+
+-- 7. Movies: Show the color, title and year for all black-and-white films
+SELECT color,movie_title,title_year
+FROM movies
+WHERE color ILIKE '%Black and white%'
+
+-- 8. Movies: Show all films with "Golden" in the title
+SELECT * FROM movies
+WHERE movie_title ILIKE '% Golden %'
+
+-- 9. Movies: Show the title, director and year of all adventure films
+SELECT movie_title,director_name,title_year
+FROM movies
+WHERE genres ILIKE '%adventure%'
+
+-- 10. Dvdrental: show the amount of the highest payment
+SELECT amount
+FROM payment
+ORDER BY amount DESC
+LIMIT 1
+
+
+SELECT MAX(amount) FROM payment

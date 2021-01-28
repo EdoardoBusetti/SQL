@@ -1,0 +1,57 @@
+-- Subqueries
+-- 1. Make a simple SELECT statement, then wrap it in a subquery and select everything from it.
+ SELECT *
+ FROM (SELECT * FROM actor) AS Sub1
+
+-- 2. Make a simple SELECT statement, then wrap it in a subquery and select just a few columns.
+ SELECT first_name, last_name
+ FROM (SELECT * FROM actor) AS Sub1
+
+-- 3. Join the film and inventory tables together, wrap the result in a subquery, and select all the rental columns.
+SELECT rental.*
+FROM
+(SELECT * 
+FROM film INNER JOIN inventory
+ON film.film_id = inventory.film_id) AS Sub1
+
+-- 4. Show the first half of the products table
+SELECT * FROM
+(SELECT *, row_number() OVER (ORDER BY Productid) AS n
+FROM Products) AS Sub1
+WHERE n < (SELECT COUNT(*) FROM Products)/2
+
+-- 5. Why is this a bad solution to the previous question:
+--SELECT * FROM Products
+-- WHERE ProductID < (SELECT COUNT(*) FROM products)/2
+    Because some ProductIDs might be missing, and therefore this option would now work. We need to calculate the row number first and then put the where condition on that
+
+-- CTEs - Common Table Expressions (WITH)
+-- 6. Set up a simple query, then put it into a CTE and select everything from it.
+WITH CTE_1 AS (SELECT * FROM products)
+SELECT * FROM CTE_1
+
+-- 7. Set up a simple query, then put it into a CTE and select some columns from it.
+WITH CTE_2 AS (SELECT * FROM products)
+SELECT Productid,productname FROM CTE_2
+
+-- 8. In a CTE, select all the films with rating G. Then CROSS JOIN this CTE to itself. Note the number of rows. 
+WITH G_rated_movies AS (
+SELECT *
+FROM film
+WHERE rating = 'G') -- 178 rows
+SELECT * FROM G_rated_movies,G_rated_movies AS cross_join
+
+-- Views
+-- 9. Take a complex query and save it as a view. Then select from the view.
+CREATE OR REPLACE VIEW Banana AS
+SELECT film_id,title FROM film
+
+SELECT * FROM Banana
+
+-- 10. Modify the previous view to run a slightly different query. Then select from the view again.
+CREATE OR REPLACE VIEW Banana AS
+SELECT film_id,title,description FROM film
+
+SELECT * FROM Banana
+-- 11. Delete the previous view.
+DROP VIEW Banana
